@@ -18,10 +18,16 @@ config/icon="res://icon.svg"
 [autoload]
 
 YusTimer="*res://YusGameFrame/YusTimer/YusTimerService.cs"
+YusEventSystem="*res://YusGameFrame/YusEventSystem/YusEventSystemService.cs"
+SimpleBinarySaver="*res://YusGameFrame/SimpleBinarySaver/SimpleBinarySaverService.cs"
 
 [dotnet]
 
 project/assembly_name="Test"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/SimpleBinarySaverEditor/plugin.cfg")
 
 [physics]
 

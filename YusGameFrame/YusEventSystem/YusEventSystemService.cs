@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace YusGameFrame.YusEventSystem;
 
@@ -50,7 +51,7 @@ public partial class YusEventSystemService : Node
         return Instance;
     }
 
-    internal void RegisterEvent(string eventKey)
+    public void RegisterEvent(string eventKey)
     {
         if (string.IsNullOrWhiteSpace(eventKey))
         {
@@ -62,47 +63,77 @@ public partial class YusEventSystemService : Node
         _listeners.TryAdd(eventKey, []);
     }
 
-    internal void AddListener(string eventKey, Node owner, Action listener)
+    public void AddListener(string eventKey, Node owner, Action listener)
     {
         AddListenerInternal(eventKey, owner, listener);
     }
 
-    internal void AddListener<T1>(string eventKey, Node owner, Action<T1> listener)
+    public void AddListener<T1>(string eventKey, Node owner, Action<T1> listener)
     {
         AddListenerInternal(eventKey, owner, listener);
     }
 
-    internal void AddListener<T1, T2>(string eventKey, Node owner, Action<T1, T2> listener)
+    public void AddListener<T1, T2>(string eventKey, Node owner, Action<T1, T2> listener)
     {
         AddListenerInternal(eventKey, owner, listener);
     }
 
-    internal void AddListener<T1, T2, T3>(string eventKey, Node owner, Action<T1, T2, T3> listener)
+    public void AddListener<T1, T2, T3>(string eventKey, Node owner, Action<T1, T2, T3> listener)
     {
         AddListenerInternal(eventKey, owner, listener);
     }
 
-    internal void RemoveListener(string eventKey, Action listener)
+    public void AddListener(string eventKey, Node owner, Action<Variant[]> listener)
+    {
+        AddListenerInternal(eventKey, owner, listener);
+    }
+
+    public void RemoveListener(string eventKey, Action listener)
     {
         RemoveListenerInternal(eventKey, listener);
     }
 
-    internal void RemoveListener<T1>(string eventKey, Action<T1> listener)
+    public void RemoveListener<T1>(string eventKey, Action<T1> listener)
     {
         RemoveListenerInternal(eventKey, listener);
     }
 
-    internal void RemoveListener<T1, T2>(string eventKey, Action<T1, T2> listener)
+    public void RemoveListener<T1, T2>(string eventKey, Action<T1, T2> listener)
     {
         RemoveListenerInternal(eventKey, listener);
     }
 
-    internal void RemoveListener<T1, T2, T3>(string eventKey, Action<T1, T2, T3> listener)
+    public void RemoveListener<T1, T2, T3>(string eventKey, Action<T1, T2, T3> listener)
     {
         RemoveListenerInternal(eventKey, listener);
     }
 
-    internal void Broadcast(string eventKey)
+    public void RemoveListener(string eventKey, Action<Variant[]> listener)
+    {
+        RemoveListenerInternal(eventKey, listener);
+    }
+
+    public void Broadcast(string eventKey)
+    {
+        BroadcastInternal(eventKey, []);
+    }
+
+    public void Broadcast<T1>(string eventKey, T1 arg1)
+    {
+        BroadcastInternal(eventKey, [Variant.From(arg1)]);
+    }
+
+    public void Broadcast<T1, T2>(string eventKey, T1 arg1, T2 arg2)
+    {
+        BroadcastInternal(eventKey, [Variant.From(arg1), Variant.From(arg2)]);
+    }
+
+    public void Broadcast<T1, T2, T3>(string eventKey, T1 arg1, T2 arg2, T3 arg3)
+    {
+        BroadcastInternal(eventKey, [Variant.From(arg1), Variant.From(arg2), Variant.From(arg3)]);
+    }
+
+    private void BroadcastInternal(string eventKey, Variant[] arguments)
     {
         if (!TryGetInvocationSnapshot(eventKey, out var listeners))
         {
@@ -113,67 +144,7 @@ public partial class YusEventSystemService : Node
         {
             try
             {
-                ((Action)listener.Callback).Invoke();
-            }
-            catch (Exception exception)
-            {
-                GD.PushError($"YusEventSystem 事件 '{eventKey}' 的监听执行失败：{exception}");
-            }
-        }
-    }
-
-    internal void Broadcast<T1>(string eventKey, T1 arg1)
-    {
-        if (!TryGetInvocationSnapshot(eventKey, out var listeners))
-        {
-            return;
-        }
-
-        foreach (var listener in listeners)
-        {
-            try
-            {
-                ((Action<T1>)listener.Callback).Invoke(arg1);
-            }
-            catch (Exception exception)
-            {
-                GD.PushError($"YusEventSystem 事件 '{eventKey}' 的监听执行失败：{exception}");
-            }
-        }
-    }
-
-    internal void Broadcast<T1, T2>(string eventKey, T1 arg1, T2 arg2)
-    {
-        if (!TryGetInvocationSnapshot(eventKey, out var listeners))
-        {
-            return;
-        }
-
-        foreach (var listener in listeners)
-        {
-            try
-            {
-                ((Action<T1, T2>)listener.Callback).Invoke(arg1, arg2);
-            }
-            catch (Exception exception)
-            {
-                GD.PushError($"YusEventSystem 事件 '{eventKey}' 的监听执行失败：{exception}");
-            }
-        }
-    }
-
-    internal void Broadcast<T1, T2, T3>(string eventKey, T1 arg1, T2 arg2, T3 arg3)
-    {
-        if (!TryGetInvocationSnapshot(eventKey, out var listeners))
-        {
-            return;
-        }
-
-        foreach (var listener in listeners)
-        {
-            try
-            {
-                ((Action<T1, T2, T3>)listener.Callback).Invoke(arg1, arg2, arg3);
+                InvokeListener(listener.Callback, arguments);
             }
             catch (Exception exception)
             {
@@ -240,6 +211,60 @@ public partial class YusEventSystemService : Node
 
         GD.PushError($"YusEventSystem 事件 '{eventKey}' 尚未注册，如有需要请重新生成 YusEventSignals.g.cs。");
         return false;
+    }
+
+    private static void InvokeListener(Delegate callback, Variant[] arguments)
+    {
+        switch (callback)
+        {
+            case Action listener when arguments.Length == 0:
+                listener.Invoke();
+                return;
+            case Action<Variant[]> rawListener:
+                rawListener.Invoke(arguments);
+                return;
+        }
+
+        callback.DynamicInvoke(ConvertArguments(arguments, callback.Method.GetParameters()));
+    }
+
+    private static object?[] ConvertArguments(IReadOnlyList<Variant> arguments, ParameterInfo[] parameters)
+    {
+        var converted = new object?[parameters.Length];
+        for (var index = 0; index < parameters.Length; index++)
+        {
+            if (index >= arguments.Count)
+            {
+                converted[index] = null;
+                continue;
+            }
+
+            converted[index] = ConvertVariant(arguments[index], parameters[index].ParameterType);
+        }
+
+        return converted;
+    }
+
+    private static object? ConvertVariant(Variant variant, Type targetType)
+    {
+        if (targetType == typeof(Variant))
+        {
+            return variant;
+        }
+
+        if (targetType == typeof(object))
+        {
+            return variant;
+        }
+
+        var asMethod = typeof(Variant).GetMethod(nameof(Variant.As), BindingFlags.Public | BindingFlags.Instance);
+        if (asMethod == null)
+        {
+            return variant;
+        }
+
+        var genericMethod = asMethod.MakeGenericMethod(targetType);
+        return genericMethod.Invoke(variant, null);
     }
 
     private sealed class ListenerEntry

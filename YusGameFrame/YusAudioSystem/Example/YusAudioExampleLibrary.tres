@@ -1,0 +1,72 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://YusGameFrame/YusAudioSystem/YusAudioLibrary.cs" id="1"]
+[ext_resource type="Script" path="res://YusGameFrame/YusAudioSystem/YusAudioDefinition.cs" id="2"]
+[ext_resource type="Script" path="res://YusGameFrame/YusAudioSystem/YusAudioEventBinding.cs" id="3"]
+[ext_resource type="AudioStreamWAV" path="res://YusGameFrame/YusAudioSystem/Example/Audio/bgm_forest.wav" id="4"]
+[ext_resource type="AudioStreamWAV" path="res://YusGameFrame/YusAudioSystem/Example/Audio/bgm_battle_intro.wav" id="5"]
+[ext_resource type="AudioStreamWAV" path="res://YusGameFrame/YusAudioSystem/Example/Audio/bgm_battle_loop.wav" id="6"]
+[ext_resource type="AudioStreamWAV" path="res://YusGameFrame/YusAudioSystem/Example/Audio/bgm_battle_outro.wav" id="7"]
+[ext_resource type="AudioStreamWAV" path="res://YusGameFrame/YusAudioSystem/Example/Audio/sfx_hit.wav" id="8"]
+[ext_resource type="AudioStreamWAV" path="res://YusGameFrame/YusAudioSystem/Example/Audio/ui_click.wav" id="9"]
+[ext_resource type="AudioStreamWAV" path="res://YusGameFrame/YusAudioSystem/Example/Audio/voice_alert.wav" id="10"]
+
+[sub_resource type="Resource" id="1"]
+script = ExtResource("3")
+EventId = "DamageReported"
+Action = 0
+TargetAudioId = "sfx_hit"
+
+[sub_resource type="Resource" id="2"]
+script = ExtResource("3")
+EventId = "PlayerHpChanged"
+Action = 0
+TargetAudioId = "voice_alert"
+DelaySeconds = 0.05
+
+[sub_resource type="Resource" id="3"]
+script = ExtResource("2")
+AudioId = "bgm_forest"
+Category = 0
+VolumeScale = 0.45
+BgmPlaybackMode = 0
+SingleStream = ExtResource("4")
+
+[sub_resource type="Resource" id="4"]
+script = ExtResource("2")
+AudioId = "bgm_battle"
+Category = 0
+VolumeScale = 0.5
+BgmPlaybackMode = 1
+IntroStream = ExtResource("5")
+LoopStream = ExtResource("6")
+OutroStream = ExtResource("7")
+WaitLoopBoundaryBeforeOutro = true
+
+[sub_resource type="Resource" id="5"]
+script = ExtResource("2")
+AudioId = "sfx_hit"
+Category = 1
+VolumeScale = 0.75
+SingleStream = ExtResource("8")
+EventBindings = [SubResource("1")]
+
+[sub_resource type="Resource" id="6"]
+script = ExtResource("2")
+AudioId = "ui_click"
+Category = 2
+VolumeScale = 0.4
+SingleStream = ExtResource("9")
+OnEnterEventIds = PackedStringArray("GameStarted")
+
+[sub_resource type="Resource" id="7"]
+script = ExtResource("2")
+AudioId = "voice_alert"
+Category = 3
+VolumeScale = 0.55
+SingleStream = ExtResource("10")
+EventBindings = [SubResource("2")]
+
+[resource]
+script = ExtResource("1")
+Definitions = [SubResource("3"), SubResource("4"), SubResource("5"), SubResource("6"), SubResource("7")]

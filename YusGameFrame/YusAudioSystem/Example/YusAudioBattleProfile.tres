@@ -1,0 +1,11 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://YusGameFrame/YusAudioSystem/YusSceneAudioProfile.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+DefaultBgmAudioId = "bgm_battle"
+EnterPolicy = 0
+ExitPolicy = 2
+EnterFadeSeconds = 0.35
+ExitFadeSeconds = 0.35

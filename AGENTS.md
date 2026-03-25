@@ -51,3 +51,45 @@
 - 示例：
   - `res://YusGameFrame/SimpleBinarySaver/Example/SimpleBinarySaverTest.cs`
   - `res://YusGameFrame/SimpleBinarySaver/Doc/SimpleBinarySaverUsage.md`
+
+### YusFSMSystem
+- 路径：`res://YusGameFrame/YusFSMSystem/`
+- 功能：提供统一的有限状态机能力，支持启动、切换、回退、停止，以及状态级生命周期回调。
+- 应用场景：角色行为切换、游戏流程控制、UI 状态管理、战斗阶段切换、可回退的运行时逻辑组织。
+- 特性：状态实例按类型缓存复用；宿主可在 `_Process` 与 `_PhysicsProcess` 中手动驱动；状态内可直接注册 `YusEventSystem` 事件，并在切换或停止时自动清理监听。
+- 入口：
+  - `res://YusGameFrame/YusFSMSystem/YusFSM.cs`
+  - `res://YusGameFrame/YusFSMSystem/YusState.cs`
+- 示例：
+  - `res://YusGameFrame/YusFSMSystem/Example/YusFSMTest.cs`
+  - `res://YusGameFrame/YusFSMSystem/Doc/YusFSMSystemUsage.md`
+
+### YusUIFlowSystem
+- 路径：`res://YusGameFrame/YusUIFlowSystem/`
+- 功能：提供统一的页面与弹窗流转能力，支持动态加载界面、路由配置、返回栈与共享数据节点联动。
+- 应用场景：主菜单切换、背包与商店页面跳转、确认弹窗、状态面板、跨场景复用 UI。
+- 特性：运行时使用 `ScreenId + ActionId` 执行路由；界面场景根节点统一继承 `YusUIScreen`；`YusUIDataNode` 提供键值数据、变更通知与可选的 `SimpleBinarySaver` 持久化；编辑器支持扫描按钮生成路由草稿。
+- 入口：
+  - `res://YusGameFrame/YusUIFlowSystem/YusUIFlowService.cs`
+  - `res://YusGameFrame/YusUIFlowSystem/YusUIScreen.cs`
+  - `res://YusGameFrame/YusUIFlowSystem/YusUIRouteConfig.cs`
+  - `res://YusGameFrame/YusUIFlowSystem/Data/YusUIDataNode.cs`
+- 示例：
+  - `res://YusGameFrame/YusUIFlowSystem/Example/YusUIFlowExampleRoot.tscn`
+  - `res://YusGameFrame/YusUIFlowSystem/Example/YusUIFlowExampleRouteConfig.tres`
+  - `res://YusGameFrame/YusUIFlowSystem/Doc/YusUIFlowSystemUsage.md`
+
+### YusAudioSystem
+- 路径：`res://YusGameFrame/YusAudioSystem/`
+- 功能：提供统一的音频库、BGM、SFX、UI、Voice 管理能力，支持场景配置接管、事件触发、淡入淡出与音量持久化。
+- 应用场景：场景默认背景音乐、战斗切歌、按钮点击音效、角色语音提示、事件驱动的演出播放。
+- 特性：运行时通过 `YusAudioService` 统一实际播放；支持 `SingleLoop` 与 `Intro/Loop/Outro` 两种 BGM 模式；场景通过 `YusSceneAudioController + YusSceneAudioProfile` 声明默认音乐策略；编辑器支持浏览、校验和批量生成音频库草稿。
+- 入口：
+  - `res://YusGameFrame/YusAudioSystem/YusAudioService.cs`
+  - `res://YusGameFrame/YusAudioSystem/YusAudioLibrary.cs`
+  - `res://YusGameFrame/YusAudioSystem/YusAudioDefinition.cs`
+  - `res://YusGameFrame/YusAudioSystem/YusSceneAudioProfile.cs`
+  - `res://YusGameFrame/YusAudioSystem/YusSceneAudioController.cs`
+- 示例：
+  - `res://YusGameFrame/YusAudioSystem/Example/YusAudioExampleRoot.tscn`
+  - `res://YusGameFrame/YusAudioSystem/Doc/YusAudioSystemUsage.md`
